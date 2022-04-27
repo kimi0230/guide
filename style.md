@@ -52,68 +52,77 @@ row before the </tbody></table> line.
 
 ## Table of Contents
 
-- [Introduction](#introduction)
-- [Guidelines](#guidelines)
-  - [Pointers to Interfaces](#pointers-to-interfaces)
-  - [Verify Interface Compliance](#verify-interface-compliance)
-  - [Receivers and Interfaces](#receivers-and-interfaces)
-  - [Zero-value Mutexes are Valid](#zero-value-mutexes-are-valid)
-  - [Copy Slices and Maps at Boundaries](#copy-slices-and-maps-at-boundaries)
-  - [Defer to Clean Up](#defer-to-clean-up)
-  - [Channel Size is One or None](#channel-size-is-one-or-none)
-  - [Start Enums at One](#start-enums-at-one)
-  - [Use `"time"` to handle time](#use-time-to-handle-time)
-  - [Errors](#errors)
-    - [Error Types](#error-types)
-    - [Error Wrapping](#error-wrapping)
-    - [Error Naming](#error-naming)
-  - [Handle Type Assertion Failures](#handle-type-assertion-failures)
-  - [Don't Panic](#dont-panic)
-  - [Use go.uber.org/atomic](#use-gouberorgatomic)
-  - [Avoid Mutable Globals](#avoid-mutable-globals)
-  - [Avoid Embedding Types in Public Structs](#avoid-embedding-types-in-public-structs)
-  - [Avoid Using Built-In Names](#avoid-using-built-in-names)
-  - [Avoid `init()`](#avoid-init)
-  - [Exit in Main](#exit-in-main)
-    - [Exit Once](#exit-once)
-  - [Use field tags in marshaled structs](#use-field-tags-in-marshaled-structs)
-- [Performance](#performance)
-  - [Prefer strconv over fmt](#prefer-strconv-over-fmt)
-  - [Avoid string-to-byte conversion](#avoid-string-to-byte-conversion)
-  - [Prefer Specifying Container Capacity](#prefer-specifying-container-capacity)
+- [Uber Go Style Guide](#uber-go-style-guide)
+  - [Table of Contents](#table-of-contents)
+  - [Introduction](#introduction)
+  - [Guidelines](#guidelines)
+    - [Pointers to Interfaces](#pointers-to-interfaces)
+    - [Verify Interface Compliance](#verify-interface-compliance)
+    - [Receivers and Interfaces](#receivers-and-interfaces)
+        - [具體的實現分兩種](#具體的實現分兩種)
+    - [Zero-value Mutexes are Valid](#zero-value-mutexes-are-valid)
+    - [Copy Slices and Maps at Boundaries](#copy-slices-and-maps-at-boundaries)
+      - [Receiving Slices and Maps](#receiving-slices-and-maps)
+      - [Returning Slices and Maps](#returning-slices-and-maps)
+    - [Defer to Clean Up](#defer-to-clean-up)
+    - [Channel Size is One or None](#channel-size-is-one-or-none)
+    - [Start Enums at One](#start-enums-at-one)
+    - [Use `"time"` to handle time](#use-time-to-handle-time)
+      - [Use `time.Time` for instants of time](#use-timetime-for-instants-of-time)
+      - [Use `time.Duration` for periods of time](#use-timeduration-for-periods-of-time)
+      - [Use `time.Time` and `time.Duration` with external systems](#use-timetime-and-timeduration-with-external-systems)
+    - [Errors](#errors)
+      - [Error Types](#error-types)
+      - [Error Wrapping](#error-wrapping)
+      - [Error Naming](#error-naming)
+    - [Handle Type Assertion Failures](#handle-type-assertion-failures)
+    - [Don't Panic](#dont-panic)
+    - [Use go.uber.org/atomic](#use-gouberorgatomic)
+    - [Avoid Mutable Globals](#avoid-mutable-globals)
+    - [Avoid Embedding Types in Public Structs](#avoid-embedding-types-in-public-structs)
+    - [Avoid Using Built-In Names](#avoid-using-built-in-names)
+    - [Avoid `init()`](#avoid-init)
+    - [Exit in Main](#exit-in-main)
+      - [Exit Once](#exit-once)
+    - [Use field tags in marshaled structs](#use-field-tags-in-marshaled-structs)
+  - [Performance](#performance)
+    - [Prefer strconv over fmt](#prefer-strconv-over-fmt)
+    - [Avoid string-to-byte conversion](#avoid-string-to-byte-conversion)
+    - [Prefer Specifying Container Capacity](#prefer-specifying-container-capacity)
       - [Specifying Map Capacity Hints](#specifying-map-capacity-hints)
       - [Specifying Slice Capacity](#specifying-slice-capacity)
-- [Style](#style)
-  - [Avoid overly long lines](#avoid-overly-long-lines)
-  - [Be Consistent](#be-consistent)
-  - [Group Similar Declarations](#group-similar-declarations)
-  - [Import Group Ordering](#import-group-ordering)
-  - [Package Names](#package-names)
-  - [Function Names](#function-names)
-  - [Import Aliasing](#import-aliasing)
-  - [Function Grouping and Ordering](#function-grouping-and-ordering)
-  - [Reduce Nesting](#reduce-nesting)
-  - [Unnecessary Else](#unnecessary-else)
-  - [Top-level Variable Declarations](#top-level-variable-declarations)
-  - [Prefix Unexported Globals with _](#prefix-unexported-globals-with-_)
-  - [Embedding in Structs](#embedding-in-structs)
-  - [Local Variable Declarations](#local-variable-declarations)
-  - [nil is a valid slice](#nil-is-a-valid-slice)
-  - [Reduce Scope of Variables](#reduce-scope-of-variables)
-  - [Avoid Naked Parameters](#avoid-naked-parameters)
-  - [Use Raw String Literals to Avoid Escaping](#use-raw-string-literals-to-avoid-escaping)
-  - [Initializing Structs](#initializing-structs)
+  - [Style](#style)
+    - [Avoid overly long lines](#avoid-overly-long-lines)
+    - [Be Consistent](#be-consistent)
+    - [Group Similar Declarations](#group-similar-declarations)
+    - [Import Group Ordering](#import-group-ordering)
+    - [Package Names](#package-names)
+    - [Function Names](#function-names)
+    - [Import Aliasing](#import-aliasing)
+    - [Function Grouping and Ordering](#function-grouping-and-ordering)
+    - [Reduce Nesting](#reduce-nesting)
+    - [Unnecessary Else](#unnecessary-else)
+    - [Top-level Variable Declarations](#top-level-variable-declarations)
+    - [Prefix Unexported Globals with _](#prefix-unexported-globals-with-_)
+    - [Embedding in Structs](#embedding-in-structs)
+    - [Local Variable Declarations](#local-variable-declarations)
+    - [nil is a valid slice](#nil-is-a-valid-slice)
+    - [Reduce Scope of Variables](#reduce-scope-of-variables)
+    - [Avoid Naked Parameters](#avoid-naked-parameters)
+    - [Use Raw String Literals to Avoid Escaping](#use-raw-string-literals-to-avoid-escaping)
+    - [Initializing Structs](#initializing-structs)
       - [Use Field Names to Initialize Structs](#use-field-names-to-initialize-structs)
       - [Omit Zero Value Fields in Structs](#omit-zero-value-fields-in-structs)
       - [Use `var` for Zero Value Structs](#use-var-for-zero-value-structs)
       - [Initializing Struct References](#initializing-struct-references)
-  - [Initializing Maps](#initializing-maps)
-  - [Format Strings outside Printf](#format-strings-outside-printf)
-  - [Naming Printf-style Functions](#naming-printf-style-functions)
-- [Patterns](#patterns)
-  - [Test Tables](#test-tables)
-  - [Functional Options](#functional-options)
-- [Linting](#linting)
+    - [Initializing Maps](#initializing-maps)
+    - [Format Strings outside Printf](#format-strings-outside-printf)
+    - [Naming Printf-style Functions](#naming-printf-style-functions)
+  - [Patterns](#patterns)
+    - [Test Tables](#test-tables)
+    - [Functional Options](#functional-options)
+  - [Linting](#linting)
+    - [Lint Runners](#lint-runners)
 
 ## Introduction
 
@@ -247,6 +256,18 @@ Methods with pointer receivers can only be called on pointers or [addressable va
 
   [addressable values]: https://golang.org/ref/spec#Method_values
 
+| Methods Receivers |  Value   |
+|:-----------------:|:--------:|
+|       (t T)       | T and *T |
+|      (t *T)       |    *T    |
+
+* Rules
+  * 值對象只可以使用值接收器方法集(Methods Receivers 是 t T)
+  * 指針對像可以使用值接收器方法集 + 指針接收器方法集
+* Interface的實現
+  * 類型實現了Interface的所有方法, 叫實現
+  * 具體的講, 要馬是類型的值方法集實現Interface, 要馬是指針方法集實現Interface
+
 For example,
 
 ```go
@@ -279,6 +300,13 @@ sPtrs[1].Write("test")
 
 Similarly, an interface can be satisfied by a pointer, even if the method has a
 value receiver.
+
+##### 具體的實現分兩種
+1. 值方法集和Interface實現
+  給Interface變量賦值的不管是值還是指針對象，都 ok，因為都包含值方法集 (t T)
+2. 指針方法集和Interface實現
+  只能將指針對象賦值給Interface變量，因為只有指針方法集和Interface實現
+  如果將值對象賦值給Interface變量，會在編譯期報錯 (會觸發Interface合理性檢查機制)
 
 ```go
 type F interface {
