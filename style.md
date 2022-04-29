@@ -460,6 +460,46 @@ trips[0] = ...
 ```
 
 </td>
+
+https://go.dev/play/p/wbz4M_OzOPL
+
+```go
+package main
+
+import "fmt"
+
+func (d *Driver) SetTripsBad(trips []int) {
+	d.trips = trips
+}
+
+func (d *Driver) SetTripsGood(trips []int) {
+	d.trips = make([]int, len(trips))
+	copy(d.trips, trips)
+}
+
+type Driver struct {
+	trips []int
+}
+
+func main() {
+
+	trips1 := []int{1, 2, 3}
+	var d1 Driver
+	d1.SetTripsBad(trips1)
+	// 修改 trips1 會導致 d1也被修改
+	trips1[0] = 2
+	fmt.Println(trips1)
+
+	trips2 := []int{1, 2, 3}
+	var d2 Driver
+	d2.SetTripsGood(trips2)
+	// Did you mean to modify d1.trips?
+	// 修改 trips2 不會導致 d2被修改
+	trips2[0] = 2
+	fmt.Println(d2.trips)
+}
+```
+
 <td>
 
 ```go
