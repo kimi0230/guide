@@ -547,6 +547,7 @@ func (s *Stats) Snapshot() map[string]int {
 
 // snapshot is no longer protected by the mutex, so any
 // access to the snapshot is subject to data races.
+// 影響 stats.counters
 snapshot := stats.Snapshot()
 ```
 
@@ -575,6 +576,54 @@ snapshot := stats.Snapshot()
 
 </td></tr>
 </tbody></table>
+
+* Bad : https://go.dev/play/p/Ct3f7jeKEom
+* Good : https://go.dev/play/p/Oo2uS0uQhVE
+
+```go
+package main
+
+import (
+	"fmt"
+	"sync"
+)
+
+type Stats struct {
+	mu       sync.Mutex
+	counters map[string]int
+}
+
+// Snapshot returns the current stats.
+func (s *Stats) Snapshot() map[string]int {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	result := make(map[string]int, len(s.counters))
+	for k, v := range s.counters {
+		result[k] = v
+	}
+	return result
+}
+
+func main() {
+	var stats Stats
+	stats.counters = map[string]int{
+		"age": 0,
+	}
+	var wg sync.WaitGroup
+	for i := 0; i < 5; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			snapshot := stats.Snapshot()
+			snapshot["age"] += 1
+			fmt.Println("snapshot =", snapshot)
+		}()
+	}
+	wg.Wait()
+	fmt.Println("stats =", stats)
+}
+```
 
 ### Defer to Clean Up
 
