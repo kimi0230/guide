@@ -303,10 +303,10 @@ value receiver.
 
 ##### 具體的實現分兩種
 1. 值方法集和Interface實現
-  給Interface變量賦值的不管是值還是指針對象，都 ok，因為都包含值方法集 (t T)
+  給Interface變量賦值的不管是值還是指針對象,都 ok,因為都包含值方法集 (t T)
 2. 指針方法集和Interface實現
-  只能將指針對象賦值給Interface變量，因為只有指針方法集和Interface實現
-  如果將值對象賦值給Interface變量，會在編譯期報錯 (會觸發Interface合理性檢查機制)
+  只能將指針對象賦值給Interface變量,因為只有指針方法集和Interface實現
+  如果將值對象賦值給Interface變量,會在編譯期報錯 (會觸發Interface合理性檢查機制)
 
 ```go
 type F interface {
@@ -3349,6 +3349,8 @@ we prefer to [declare empty slices][Declaring Empty Slices].
 Use `&T{}` instead of `new(T)` when initializing struct references so that it
 is consistent with the struct initialization.
 
+在初始化 Struct 引用時, 使用 `&T{}` 代替 `new(T)`, 以使其結構初始化一致.
+
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
 <tbody>
@@ -3379,6 +3381,8 @@ Prefer `make(..)` for empty maps, and maps populated
 programmatically. This makes map initialization visually
 distinct from declaration, and it makes it easy to add size
 hints later if available.
+
+對於空 map 請使用 `make(..)` 初始化, 並且 map 是通過編譯方式填充的. 這使得 map 初始化在表現上不同於聲明, 並且它還可以方便地在 make 後添加大小提示.
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
@@ -3461,6 +3465,9 @@ If you declare format strings for `Printf`-style functions outside a string
 literal, make them `const` values.
 
 This helps `go vet` perform static analysis of the format string.
+
+如果你在函式外 declare `Printf`-style 函式的格式字符串, 請將其設置為 `const` 常數.
+這個有助於 `go vet` 對格式字符串執行靜態分析.
 
 <table>
 <thead><tr><th>Bad</th><th>Good</th></tr></thead>
