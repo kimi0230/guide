@@ -1288,6 +1288,7 @@ Panic/recover is not an error handling strategy. A program must panic only when
 something irrecoverable happens such as a nil dereference. An exception to this is
 program initialization: bad things at program startup that should abort the
 program may cause panic.
+panic/recover 不是錯誤處理策略. 當發生不可恢復的事情(例如：nil 引用) 時, 程式才需要 panic.
 
 ```go
 var _statusTemplate = template.Must(template.New("name").Parse("_statusHTML"))
