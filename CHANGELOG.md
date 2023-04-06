@@ -1,3 +1,11 @@
+# 2023-03-03
+
+- Receivers and Interfaces: Clarify subtlety with pointer receivers and values.
+
+# 2022-10-18
+
+- Add guidance on managing goroutine lifecycles.
+
 # 2022-03-30
 
 - Add guidance on using field tags in marshaled structs.
